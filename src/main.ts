@@ -6,7 +6,6 @@ import { Scene } from "./core/scene";
 import { SampleHelloTriangle } from "./samples/hello-triangle";
 import { InterStageTriangle } from "./samples/inter-stage-triangle";
 import { UniformTriangle } from "./samples/uniform-triangle copy";
-import { FastColor } from "@ant-design/fast-color";
 import { RepeatTriangle } from "./samples/repeat-triangle";
 
 async function wgpuAppEntrypoint() {
@@ -63,17 +62,17 @@ wgpuAppEntrypoint().then(({ container }) => {
         offset: { x: 0, y: -0.25 },
       },
       {
-        color: "#5da53344",
+        color: "#a5333344",
         scale: 1,
         offset: { x: 0, y: -0.25 },
       },
       {
-        color: "#5da53344",
+        color: "#5c05fc44",
         scale: 1,
         offset: { x: 0.2, y: 0.25 },
       },
       {
-        color: "#5da53344",
+        color: "#00ffff6e",
         scale: 1,
         offset: { x: -0.2, y: 0.25 },
       },

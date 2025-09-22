@@ -11,6 +11,8 @@ import { PrimitivePoints } from "./samples/5-primitive-points";
 import { FastColor } from "@ant-design/fast-color";
 import { randomInteger } from "./shared/random";
 import { PrimitiveLine } from "./samples/6-primitive-line";
+import { PrimitivePointsInstances } from "./samples/7-primitive-points-instances";
+import { PrimitivePointsStorageBuffer } from "./samples/8-primitive-points-storage-buffer";
 
 async function wgpuAppEntrypoint() {
   const adapter = await navigator.gpu?.requestAdapter();
@@ -92,15 +94,15 @@ wgpuAppEntrypoint().then(({ container }) => {
 wgpuAppEntrypoint().then(({ container }) => {
   container.bind(PrimitivePoints).toSelf();
 
-  const triangle = container.get<PrimitivePoints>(PrimitivePoints);
+  const points = container.get<PrimitivePoints>(PrimitivePoints);
 
-  triangle.draw({
+  points.draw({
     items: Array.from({ length: 10000 }).map(() => ({
-      color: new FastColor({
+      color: {
         r: randomInteger(0, 255),
         g: randomInteger(0, 255),
         b: randomInteger(0, 255),
-      }).toHexString(),
+      },
       position: [
         Math.random() * (Math.random() > 0.5 ? 1 : -1),
         Math.random() * (Math.random() > 0.5 ? 1 : -1),
@@ -113,20 +115,66 @@ wgpuAppEntrypoint().then(({ container }) => {
 wgpuAppEntrypoint().then(({ container }) => {
   container.bind(PrimitiveLine).toSelf();
 
-  const triangle = container.get<PrimitiveLine>(PrimitiveLine);
+  const lines = container.get<PrimitiveLine>(PrimitiveLine);
 
-  triangle.draw({
+  lines.draw({
     items: Array.from({ length: 100 }).map(() => ({
-      color: new FastColor({
+      color: {
         r: randomInteger(0, 255),
         g: randomInteger(0, 255),
         b: randomInteger(0, 255),
-      }).toHexString(),
+      },
       start: [
         Math.random() * (Math.random() > 0.5 ? 1 : -1),
         Math.random() * (Math.random() > 0.5 ? 1 : -1),
       ],
       end: [
+        Math.random() * (Math.random() > 0.5 ? 1 : -1),
+        Math.random() * (Math.random() > 0.5 ? 1 : -1),
+      ],
+    })),
+  });
+});
+
+//примитивные точки с использованием инстансинга
+wgpuAppEntrypoint().then(({ container }) => {
+  container.bind(PrimitivePointsInstances).toSelf();
+
+  const points = container.get<PrimitivePointsInstances>(
+    PrimitivePointsInstances
+  );
+
+  points.draw({
+    items: Array.from({ length: 10000 }).map(() => ({
+      color: {
+        r: randomInteger(0, 255),
+        g: randomInteger(0, 255),
+        b: randomInteger(0, 255),
+      },
+      position: [
+        Math.random() * (Math.random() > 0.5 ? 1 : -1),
+        Math.random() * (Math.random() > 0.5 ? 1 : -1),
+      ],
+    })),
+  });
+});
+
+//примитивные точки с использованием storage buffer
+wgpuAppEntrypoint().then(({ container }) => {
+  container.bind(PrimitivePointsStorageBuffer).toSelf();
+
+  const points = container.get<PrimitivePointsStorageBuffer>(
+    PrimitivePointsStorageBuffer
+  );
+
+  points.draw({
+    items: Array.from({ length: 10000 }).map(() => ({
+      color: {
+        r: randomInteger(0, 255),
+        g: randomInteger(0, 255),
+        b: randomInteger(0, 255),
+      },
+      position: [
         Math.random() * (Math.random() > 0.5 ? 1 : -1),
         Math.random() * (Math.random() > 0.5 ? 1 : -1),
       ],

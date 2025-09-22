@@ -8,15 +8,18 @@ import { InterStageTriangle } from "./samples/2-inter-stage-triangle";
 import { UniformTriangle } from "./samples/3-uniform-triangle";
 import { RepeatTriangle } from "./samples/4-repeat-triangle";
 import { PrimitivePoints } from "./samples/5-primitive-points";
-import { FastColor } from "@ant-design/fast-color";
 import { randomInteger } from "./shared/random";
 import { PrimitiveLine } from "./samples/6-primitive-line";
 import { PrimitivePointsInstances } from "./samples/7-primitive-points-instances";
 import { PrimitivePointsStorageBuffer } from "./samples/8-primitive-points-storage-buffer";
+import { AnimateRotationTriangle } from "./samples/9-animate-rotation-triangle";
+
+let adapter: GPUAdapter | null;
+let device: GPUDevice | undefined;
 
 async function wgpuAppEntrypoint() {
-  const adapter = await navigator.gpu?.requestAdapter();
-  const device = await adapter?.requestDevice();
+  adapter = adapter ?? (await navigator.gpu?.requestAdapter());
+  device = device ?? (await adapter?.requestDevice());
   if (!device) {
     throw new Error("Not supported webgpu");
   }
@@ -180,4 +183,31 @@ wgpuAppEntrypoint().then(({ container }) => {
       ],
     })),
   });
+});
+
+//анимация треугольника
+wgpuAppEntrypoint().then(({ container }) => {
+  container.bind(AnimateRotationTriangle).toSelf();
+
+  const triangle = container.get<AnimateRotationTriangle>(
+    AnimateRotationTriangle
+  );
+  let position = 0;
+
+  let lastTime = 0;
+  const animation = (time: number) => {
+    const dt = time - lastTime;
+    position += dt / 1000;
+
+    triangle.draw({
+      color: "#0084ffff",
+      scale: 0.2,
+      offset: { x: Math.sin(position), y: Math.sin(position) },
+      rotation: position * 100,
+    });
+    lastTime = time;
+    requestAnimationFrame(animation);
+  };
+
+  requestAnimationFrame(animation);
 });

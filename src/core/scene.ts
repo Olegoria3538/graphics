@@ -12,8 +12,8 @@ export class Scene {
 
     this.canvas = document.createElement("canvas");
 
-    this.canvas.width = 100;
-    this.canvas.height = 100;
+    this.canvas.width = 300;
+    this.canvas.height = 300;
 
     document.body.appendChild(this.canvas);
 

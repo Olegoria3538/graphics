@@ -13,6 +13,9 @@ import { PrimitiveLine } from "./samples/6-primitive-line";
 import { PrimitivePointsInstances } from "./samples/7-primitive-points-instances";
 import { PrimitivePointsStorageBuffer } from "./samples/8-primitive-points-storage-buffer";
 import { AnimateRotationTriangle } from "./samples/9-animate-rotation-triangle";
+import { SimpleTexture } from "./samples/10-simple-texture";
+import { Squares } from "./samples/11-squares";
+import { SquaresTextures } from "./samples/12-squares-texture";
 
 let adapter: GPUAdapter | null;
 let device: GPUDevice | undefined;
@@ -210,4 +213,55 @@ wgpuAppEntrypoint().then(({ container }) => {
   };
 
   requestAnimationFrame(animation);
+});
+
+//простая текстура
+wgpuAppEntrypoint().then(({ container }) => {
+  container.bind(SimpleTexture).toSelf();
+
+  const points = container.get<SimpleTexture>(SimpleTexture);
+
+  points.draw();
+});
+
+//прямогульники
+wgpuAppEntrypoint().then(({ container }) => {
+  container.bind(Squares).toSelf();
+
+  const squares = container.get<Squares>(Squares);
+
+  squares.draw({
+    items: Array.from({ length: 1000 }).map(() => ({
+      color: {
+        r: randomInteger(0, 255),
+        g: randomInteger(0, 255),
+        b: randomInteger(0, 255),
+        a: Math.random(),
+      },
+      scale: Math.random() * 0.1,
+      offset: {
+        x: Math.random() * (Math.random() > 0.5 ? 1 : -1),
+        y: Math.random() * (Math.random() > 0.5 ? 1 : -1),
+      },
+    })),
+  });
+});
+
+//прямогульники с текстурой
+wgpuAppEntrypoint().then(({ container }) => {
+  container.bind(SquaresTextures).toSelf();
+
+  const squares = container.get<SquaresTextures>(SquaresTextures);
+
+  squares.draw({
+    items: Array.from({ length: 100 }).map((_, i) => ({
+      textureUrl:
+        i % 2 ? "/luna-noch-ozera-pejzazh-priroda-50020.jpeg" : "person.png",
+      scale: Math.random() * 0.1,
+      offset: {
+        x: Math.random() * (Math.random() > 0.5 ? 1 : -1),
+        y: Math.random() * (Math.random() > 0.5 ? 1 : -1),
+      },
+    })),
+  });
 });

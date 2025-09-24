@@ -2,8 +2,7 @@ import { inject, injectable } from "inversify";
 import { Scene } from "../core/scene";
 import { makeShaderDataDefinitions, makeStructuredView } from "webgpu-utils";
 import { FastColor, type ColorInput } from "@ant-design/fast-color";
-
-//uniform это механизм, который позволяет передавать данные в шейдеры из js
+import { randomInteger } from "../shared/random";
 
 const CODE = /* wgsl */ `
       struct OurStruct {
@@ -24,7 +23,6 @@ const CODE = /* wgsl */ `
           vec2f(-0.5, -0.5),  // bottom left
           vec2f( 0.5, -0.5)   // bottom right
         );
-        
 
         return vec4f(pos[vertexIndex] * ourStruct.scale + ourStruct.offset, 0.0, 1.0);
       }
@@ -36,34 +34,67 @@ const CODE = /* wgsl */ `
     `;
 
 @injectable()
-export class RepeatTriangle {
-  constructor(@inject(Scene) readonly scene: Scene) {}
+export class AddTriangleByClickMultiBuffers {
+  private triangles: {
+    color: ColorInput;
+    scale: number;
+    offset: { x: number; y: number };
+  }[] = [];
 
-  public draw({
-    items: itemsProp,
-  }: {
-    items: {
-      color: ColorInput;
-      scale: number;
-      offset: { x: number; y: number };
-    }[];
-  }) {
+  constructor(@inject(Scene) readonly scene: Scene) {
+    scene.canvas.addEventListener("click", (e) => {
+      const offsetX = e.offsetX;
+      const offsetY = e.offsetY;
+
+      const x = (offsetX / scene.canvas.width) * 2 - 1;
+      const y = 1 - (offsetY / scene.canvas.height) * 2;
+
+      this.triangles.push({
+        color: {
+          r: randomInteger(0, 255),
+          g: randomInteger(0, 255),
+          b: randomInteger(0, 255),
+          a: Math.random(),
+        },
+        scale: Math.random(),
+        offset: { x, y },
+      });
+
+      this.renderAllTriangles();
+    });
+  }
+
+  private renderAllTriangles() {
     const scene = this.scene;
 
-    const defs = makeShaderDataDefinitions(CODE);
-    const ourStruct = makeStructuredView(defs.uniforms.ourStruct);
+    const encoder = scene.gpu.device.createCommandEncoder({
+      label: "our encoder",
+    });
 
+    const renderPassDescriptor: GPURenderPassDescriptor = {
+      label: "our basic canvas renderPass",
+      colorAttachments: [
+        {
+          view: scene.context.getCurrentTexture().createView(),
+          clearValue: [1, 1, 1, 1],
+          loadOp: "clear",
+          storeOp: "store",
+        },
+      ],
+    };
+
+    const pass = encoder.beginRenderPass(renderPassDescriptor);
+
+    // Создаем пайплайн один раз (вынесите это в отдельный метод для оптимизации)
     const module = scene.gpu.device.createShaderModule({
       label: "uniform triangle shaders",
       code: CODE,
     });
 
     const pipeline = scene.gpu.device.createRenderPipeline({
-      label: "our hardcoded red triangle pipeline",
+      label: "our triangle pipeline",
       layout: "auto",
-      vertex: {
-        module,
-      },
+      vertex: { module },
       fragment: {
         module,
         targets: [
@@ -86,23 +117,31 @@ export class RepeatTriangle {
       },
     });
 
-    const items = itemsProp.map(({ color, scale, offset }) => {
+    pass.setPipeline(pipeline);
+
+    // Рисуем все треугольники в одном рендер-пассе
+    this.triangles.forEach((triangle) => {
+      const scene = this.scene;
+      const defs = makeShaderDataDefinitions(CODE);
+      const ourStruct = makeStructuredView(defs.uniforms.ourStruct);
+
       const uniformBuffer = scene.gpu.device.createBuffer({
         size: ourStruct.arrayBuffer.byteLength,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       });
 
       let colorRgb = [] as number[];
-
       {
-        const _color = new FastColor(color);
+        const _color = new FastColor(triangle.color);
         const { r, g, b, a } = _color.toRgb();
         colorRgb = [r / 255, g / 255, b / 255, a];
       }
 
-      ourStruct.set({ color: colorRgb });
-      ourStruct.set({ scale: [scale, scale] });
-      ourStruct.set({ offset: [offset.x, offset.y] });
+      ourStruct.set({
+        color: colorRgb,
+        scale: [triangle.scale, triangle.scale],
+        offset: [triangle.offset.x, triangle.offset.y],
+      });
 
       scene.gpu.device.queue.writeBuffer(
         uniformBuffer,
@@ -111,42 +150,16 @@ export class RepeatTriangle {
       );
 
       const bindGroup = scene.gpu.device.createBindGroup({
-        layout: pipeline.getBindGroupLayout(0),
+        layout: pipeline!.getBindGroupLayout(0),
         entries: [{ binding: 0, resource: { buffer: uniformBuffer } }],
       });
 
-      return { uniformBuffer, bindGroup };
-    });
-
-    const renderPassDescriptor: GPURenderPassDescriptor = {
-      label: "our basic canvas renderPass",
-      colorAttachments: [
-        {
-          view: scene.context.getCurrentTexture().createView(),
-          clearValue: [1, 1, 1, 1],
-          loadOp: "clear",
-          storeOp: "store",
-        },
-      ],
-    };
-
-    const encoder = scene.gpu.device.createCommandEncoder({
-      label: "our encoder",
-    });
-
-    // make a render pass encoder to encode render specific commands
-    const pass = encoder.beginRenderPass(renderPassDescriptor);
-    pass.setPipeline(pipeline);
-
-    items.forEach(({ bindGroup }) => {
       pass.setBindGroup(0, bindGroup);
       pass.draw(3);
     });
 
     pass.end();
 
-    scene.render({
-      buffer: encoder.finish(),
-    });
+    scene.render({ buffer: encoder.finish() });
   }
 }

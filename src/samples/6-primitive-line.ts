@@ -147,7 +147,7 @@ export class PrimitiveLine {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
   }
 }

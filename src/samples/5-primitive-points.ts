@@ -139,7 +139,7 @@ export class PrimitivePoints {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
   }
 }

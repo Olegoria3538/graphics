@@ -147,7 +147,7 @@ export class AnimateRotationTriangle {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
   }
 }

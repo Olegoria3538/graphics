@@ -64,7 +64,7 @@ export class SampleHelloTriangle {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
   }
 }

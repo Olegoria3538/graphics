@@ -134,6 +134,6 @@ export class SimpleTexture {
     pass.draw(6, 1, 0, 0);
     pass.end();
 
-    this.scene.render({ encoder });
+    this.scene.render({ buffer: encoder.finish() });
   }
 }

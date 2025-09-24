@@ -85,7 +85,7 @@ export class InterStageTriangle {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
   }
 }

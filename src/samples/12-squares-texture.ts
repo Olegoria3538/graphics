@@ -63,6 +63,8 @@ const CODE = /* wgsl */ `
 
 @injectable()
 export class SquaresTextures {
+  private textures = new Map<string, GPUTexture>();
+
   constructor(@inject(Scene) readonly scene: Scene) {}
 
   public async draw({
@@ -119,14 +121,18 @@ export class SquaresTextures {
 
     const itemsPromises = itemsProp.map(
       async ({ scale, offset, textureUrl }) => {
-        const texture = await createTextureFromImage(
-          this.scene.gpu.device,
-          textureUrl,
-          {
-            mips: true,
-            flipY: true,
-          }
-        );
+        const hasTexture = this.textures.has(textureUrl);
+
+        const texture = hasTexture
+          ? this.textures.get(textureUrl)!
+          : await createTextureFromImage(this.scene.gpu.device, textureUrl, {
+              mips: true,
+              flipY: true,
+            });
+
+        if (!hasTexture) {
+          this.textures.set(textureUrl, texture);
+        }
 
         const uniformBuffer = scene.gpu.device.createBuffer({
           size: ourStruct.arrayBuffer.byteLength,
@@ -183,7 +189,7 @@ export class SquaresTextures {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
   }
 }

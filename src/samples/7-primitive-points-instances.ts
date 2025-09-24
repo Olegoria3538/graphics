@@ -166,6 +166,6 @@ export class PrimitivePointsInstances {
     pass.draw(1, itemsProp.length); // Рисуем 1 вершину на каждый инстанс
     pass.end();
 
-    scene.render({ encoder });
+    scene.render({ buffer: encoder.finish() });
   }
 }

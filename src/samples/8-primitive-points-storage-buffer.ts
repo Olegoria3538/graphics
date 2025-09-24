@@ -169,7 +169,7 @@ export class PrimitivePointsStorageBuffer {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
 
     // Clean up

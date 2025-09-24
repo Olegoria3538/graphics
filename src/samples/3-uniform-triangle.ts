@@ -135,7 +135,7 @@ export class UniformTriangle {
     pass.end();
 
     scene.render({
-      encoder,
+      buffer: encoder.finish(),
     });
   }
 }

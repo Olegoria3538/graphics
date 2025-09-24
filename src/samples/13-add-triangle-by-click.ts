@@ -4,11 +4,14 @@ import { makeShaderDataDefinitions, makeStructuredView } from "webgpu-utils";
 import { FastColor, type ColorInput } from "@ant-design/fast-color";
 import { randomInteger } from "../shared/random";
 
+//TODO: переписать с использованием инстансов
+
 const CODE = /* wgsl */ `
       struct OurStruct {
         color: vec4f,
         scale: vec2f,
-        offset: vec2f
+        offset: vec2f,
+        angle: f32
       };
 
       @group(0) @binding(0) var<uniform> ourStruct: OurStruct;
@@ -24,7 +27,15 @@ const CODE = /* wgsl */ `
           vec2f( 0.5, -0.5)   // bottom right
         );
 
-        return vec4f(pos[vertexIndex] * ourStruct.scale + ourStruct.offset, 0.0, 1.0);
+
+        let cosA = cos(ourStruct.angle);
+        let sinA = sin(ourStruct.angle);
+        let rotationMatrix = mat2x2<f32>(
+            cosA, -sinA,
+            sinA,  cosA
+        );
+
+        return vec4f(rotationMatrix * pos[vertexIndex] * ourStruct.scale + ourStruct.offset, 0.0, 1.0);
       }
 
       @fragment 
@@ -40,6 +51,7 @@ export class AddTriangleByClickMultiBuffers {
     scale: number;
     offset: { x: number; y: number };
   }[] = [];
+  public rotate: number = 0;
 
   constructor(@inject(Scene) readonly scene: Scene) {
     scene.canvas.addEventListener("click", (e) => {
@@ -62,6 +74,10 @@ export class AddTriangleByClickMultiBuffers {
 
       this.renderAllTriangles();
     });
+  }
+
+  public reDraw() {
+    this.renderAllTriangles();
   }
 
   private renderAllTriangles() {
@@ -141,6 +157,7 @@ export class AddTriangleByClickMultiBuffers {
         color: colorRgb,
         scale: [triangle.scale, triangle.scale],
         offset: [triangle.offset.x, triangle.offset.y],
+        angle: (this.rotate * Math.PI) / 180,
       });
 
       scene.gpu.device.queue.writeBuffer(

@@ -3,8 +3,6 @@ import { Scene } from "../core/scene";
 import { makeShaderDataDefinitions, makeStructuredView } from "webgpu-utils";
 import { FastColor, type ColorInput } from "@ant-design/fast-color";
 
-//uniform это механизм, который позволяет передавать данные в шейдеры из js
-
 const CODE = /* wgsl */ `
       struct OurStruct {
         color: vec4f,

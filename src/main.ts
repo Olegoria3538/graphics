@@ -291,9 +291,25 @@ wgpuAppEntrypoint({ title: "добавление треугольника по �
   ({ container }) => {
     container.bind(AddTriangleByClickMultiBuffers).toSelf();
 
-    container.get<AddTriangleByClickMultiBuffers>(
+    const triangles = container.get<AddTriangleByClickMultiBuffers>(
       AddTriangleByClickMultiBuffers
     );
+
+    let lastTime = 0;
+    let rotate = 0;
+    const reDraw = (time: number) => {
+      const dt = time - lastTime;
+      lastTime = time;
+
+      rotate += dt / 100;
+
+      triangles.rotate = rotate;
+
+      triangles.reDraw();
+      requestAnimationFrame(reDraw);
+    };
+
+    requestAnimationFrame(reDraw);
   }
 );
 

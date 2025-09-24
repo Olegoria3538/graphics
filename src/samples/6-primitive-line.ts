@@ -3,7 +3,7 @@ import { Scene } from "../core/scene";
 import { makeShaderDataDefinitions, makeStructuredView } from "webgpu-utils";
 import { FastColor, type ColorInput } from "@ant-design/fast-color";
 
-//примитивным точкам нельзя задать ширину
+//примитивным точкам нельзя задать размер
 
 const CODE = /* wgsl */ `
       struct OurStruct {

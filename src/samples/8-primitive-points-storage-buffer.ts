@@ -165,7 +165,7 @@ export class PrimitivePointsStorageBuffer {
     const pass = encoder.beginRenderPass(renderPassDescriptor);
     pass.setPipeline(this.pipeline);
     pass.setBindGroup(0, bindGroup);
-    pass.draw(1, itemsProp.length); // Draw 1 vertex per instance, for all instances
+    pass.draw(1, itemsProp.length);
     pass.end();
 
     scene.render({

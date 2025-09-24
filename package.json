@@ -17,6 +17,7 @@
     "@ant-design/fast-color": "^3.0.0",
     "inversify": "^7.10.0",
     "reflect-metadata": "^0.2.2",
-    "webgpu-utils": "^2.0.2"
+    "webgpu-utils": "^2.0.2",
+    "wgpu-matrix": "^3.4.0"
   }
 }

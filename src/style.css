@@ -1,3 +1,16 @@
+:root {
+  --bg-color: #ффф;
+  --line-color-1: #ААА;
+  --line-color-2: #ДДД;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #000;
+    --line-color-1: #666;
+    --line-color-2: #333;
+  }
+}
+
 * {
   box-sizing: border-box;
   font-family: sans-serif;
@@ -6,4 +19,20 @@
 body {
   margin: 0;
   padding: 0;
+}
+
+canvas {
+  display: block; /* заставляем холст работать как блок */
+  width: 100%; /* заставляем холст заполнить свой контейнер */
+  height: 100%;
+  background-color: var(--bg-color);
+  background-image: linear-gradient(
+      var(--line-color-1) 1.5px,
+      transparent 1.5px
+    ),
+    linear-gradient(90deg, var(--line-color-1) 1.5px, transparent 1.5px),
+    linear-gradient(var(--line-color-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-color-2) 1px, transparent 1px);
+  background-position: -1.5px -1.5px, -1.5px -1.5px, -1px -1px, -1px -1px;
+  background-size: 100px 100px, 100px 100px, 10px 10px, 10px 10px;
 }

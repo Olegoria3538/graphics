@@ -439,3 +439,8 @@ webgpu-utils@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/webgpu-utils/-/webgpu-utils-2.0.2.tgz#06bbc033684bce873260199c7eea7bf0d7aa75bd"
   integrity sha512-uoReAiZwl15ITelmp7hHL+eXg/E6VsRDFqWP4ZHkDruAO8pXS/cZGNY+vOWAc6LALJ8zefK1skUl9AVRuv5ijg==
+
+wgpu-matrix@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/wgpu-matrix/-/wgpu-matrix-3.4.0.tgz#b1ed1456e0411d0803c6f094c5a3444b0ebd79d1"
+  integrity sha512-kXHrbAPKEn9A32Wf4wVldyx9MmnzwhuB5p8GCqoJP3ItU5+iDT4J3aTQwPZWkfb153hwGtqZtUwR2M+ipJKadg==

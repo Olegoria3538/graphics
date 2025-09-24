@@ -160,7 +160,7 @@ export class AddTriangleByClick {
     // Отправляем ВСЕ буферы разом
     scene.render({
       buffer: commandBuffers,
-      clear: { enabled: true, color: { r: 255, g: 255, b: 255, a: 1 } },
+      clear: { enabled: true, color: { r: 0, g: 0, b: 0, a: 0 } },
     });
   }
 

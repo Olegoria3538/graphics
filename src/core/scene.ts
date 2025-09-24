@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { GpuService } from "./gpu";
-import { FastColor, type ColorInput } from "@ant-design/fast-color";
+import { FastColor, type ColorInput, type RGB } from "@ant-design/fast-color";
 import { DI_TOKENS } from "../shared/constants";
 import type { WgpuAppSettings } from "../shared/types";
 
@@ -39,6 +39,7 @@ export class Scene {
     this.context.configure({
       device: gpu.device,
       format: gpu.presentationFormat,
+      alphaMode: "premultiplied",
     });
   }
 
@@ -54,17 +55,22 @@ export class Scene {
   }) {
     const buffers = [] as GPUCommandBuffer[];
 
-    if (clear) {
+    if (clear?.enabled) {
       const clearEncoder = this.gpu.device.createCommandEncoder();
 
-      const color = new FastColor(clear.color);
-      const { r, g, b, a } = color.toRgb();
+      let color: RGB | null = null;
+
+      if (clear.color) {
+        color = new FastColor(clear.color).toRgb();
+      }
 
       const pass = clearEncoder.beginRenderPass({
         colorAttachments: [
           {
             view: this.context.getCurrentTexture().createView(),
-            clearValue: [r / 255, g / 255, b / 255, a],
+            clearValue: color
+              ? [color.r / 255, color.g / 255, color.b / 255, color.a]
+              : undefined,
             loadOp: "clear",
             storeOp: "store",
           },

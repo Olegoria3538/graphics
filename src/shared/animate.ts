@@ -4,11 +4,13 @@ export const animate = (
   let lastTime = 0;
   let d = 0;
 
-  requestAnimationFrame((time) => {
+  const fn = (time: number) => {
     const dt = time - lastTime;
     lastTime = time;
     d += dt;
     callback({ time, dt, d });
-    requestAnimationFrame(() => animate(callback));
-  });
+    requestAnimationFrame(fn);
+  };
+
+  requestAnimationFrame(fn);
 };

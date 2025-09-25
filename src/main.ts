@@ -21,6 +21,7 @@ import { AddTriangleByClick } from "./samples/14-add-triangle-by-click-multi-buf
 import type { WgpuAppSettings } from "./shared/types";
 import { TriangleUseMatrix } from "./samples/15-triangle-use-matrix";
 import { Cube } from "./samples/16-cube";
+import { animate } from "./shared/animate";
 
 const elementContainer = document.createElement("div");
 elementContainer.style.display = "flex";
@@ -225,24 +226,15 @@ wgpuAppEntrypoint({ title: "animate rotation triangle" }).then(
     const triangle = container.get<AnimateRotationTriangle>(
       AnimateRotationTriangle
     );
-    let position = 0;
 
-    let lastTime = 0;
-    const animation = (time: number) => {
-      const dt = time - lastTime;
-      position += dt / 1000;
-
+    animate(({ d }) => {
       triangle.draw({
         color: "#0084ffff",
         scale: 0.2,
-        offset: { x: Math.sin(position), y: Math.sin(position) },
-        rotation: position * 100,
+        offset: { x: Math.sin(d / 1000), y: Math.sin(d / 1000) },
+        rotation: d / 10,
       });
-      lastTime = time;
-      requestAnimationFrame(animation);
-    };
-
-    requestAnimationFrame(animation);
+    });
   }
 );
 
@@ -305,21 +297,10 @@ wgpuAppEntrypoint({ title: "добавление треугольника по �
       AddTriangleByClickMultiBuffers
     );
 
-    let lastTime = 0;
-    let rotate = 0;
-    const reDraw = (time: number) => {
-      const dt = time - lastTime;
-      lastTime = time;
-
-      rotate += dt / 100;
-
-      triangles.rotate = rotate;
-
+    animate(({ d }) => {
+      triangles.rotate = d / 100;
       triangles.reDraw();
-      requestAnimationFrame(reDraw);
-    };
-
-    requestAnimationFrame(reDraw);
+    });
   }
 );
 
@@ -341,22 +322,13 @@ wgpuAppEntrypoint({
 
   const triangleUseMatrix = container.get<TriangleUseMatrix>(TriangleUseMatrix);
 
-  let lastTime = 0;
-  let d = 0;
-  const draw = (time: number) => {
-    const dt = time - lastTime;
-    lastTime = time;
-    d += dt;
-
+  animate(({ d }) => {
     triangleUseMatrix.draw({
       rotate: d / 10,
       scale: [Math.sin(d / 1000) / 10, Math.sin(d / 1000) / 10],
       offset: { x: Math.sin(d / 1000), y: Math.sin(d / 1000) },
     });
-    requestAnimationFrame(draw);
-  };
-
-  requestAnimationFrame(draw);
+  });
 });
 
 //куб
@@ -368,17 +340,7 @@ wgpuAppEntrypoint({
 
   const сube = container.get<Cube>(Cube);
 
-  let lastTime = 0;
-  let d = 0;
-  const draw = (time: number) => {
-    const dt = time - lastTime;
-    lastTime = time;
-    d += dt;
-
-    сube.draw({ rotate: d / 10, scale: [0.3, 0.3, 0.3], offset: [0, 0, 0] });
-
-    requestAnimationFrame(draw);
-  };
-
-  requestAnimationFrame(draw);
+  animate((x) => {
+    сube.draw({ rotate: x.d / 10, scale: [0.3, 0.3, 0.3], offset: [0, 0, 0] });
+  });
 });

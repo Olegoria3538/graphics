@@ -19,17 +19,26 @@ import { SquaresTextures } from "./samples/12-squares-texture";
 import { AddTriangleByClickMultiBuffers } from "./samples/13-add-triangle-by-click";
 import { AddTriangleByClick } from "./samples/14-add-triangle-by-click-multi-buffers";
 import type { WgpuAppSettings } from "./shared/types";
+import { TriangleUseMatrix } from "./samples/15-triangle-use-matrix";
+import { Cube } from "./samples/16-cube";
 
 const elementContainer = document.createElement("div");
 elementContainer.style.display = "flex";
 elementContainer.style.flexFlow = "wrap";
 elementContainer.style.gap = "16px";
+elementContainer.style.padding = "4px";
 document.body.appendChild(elementContainer);
 
 let adapter: GPUAdapter | null;
 let device: GPUDevice | undefined;
 
-async function wgpuAppEntrypoint({ title }: { title: string }) {
+async function wgpuAppEntrypoint({
+  title,
+  alphaMode,
+}: {
+  title: string;
+  alphaMode?: GPUCanvasAlphaMode;
+}) {
   adapter = adapter ?? (await navigator.gpu?.requestAdapter());
   device = device ?? (await adapter?.requestDevice());
   if (!device) {
@@ -41,6 +50,7 @@ async function wgpuAppEntrypoint({ title }: { title: string }) {
   const settings: WgpuAppSettings = {
     title,
     elementTarget: elementContainer,
+    alphaMode,
   };
 
   container.bind(DI_TOKENS.GLOBAL_SETTINGS).toConstantValue(settings);
@@ -316,8 +326,59 @@ wgpuAppEntrypoint({ title: "добавление треугольника по �
 //добавление треугольника по клику (multi buffers)
 wgpuAppEntrypoint({
   title: "добавление по клику (multi buffers)",
+  alphaMode: "premultiplied",
 }).then(({ container }) => {
   container.bind(AddTriangleByClick).toSelf();
 
   container.get<AddTriangleByClick>(AddTriangleByClick);
+});
+
+//матричные преобразования
+wgpuAppEntrypoint({
+  title: "матричные преобразования",
+}).then(({ container }) => {
+  container.bind(TriangleUseMatrix).toSelf();
+
+  const triangleUseMatrix = container.get<TriangleUseMatrix>(TriangleUseMatrix);
+
+  let lastTime = 0;
+  let d = 0;
+  const draw = (time: number) => {
+    const dt = time - lastTime;
+    lastTime = time;
+    d += dt;
+
+    triangleUseMatrix.draw({
+      rotate: d / 10,
+      scale: [Math.sin(d / 1000) / 10, Math.sin(d / 1000) / 10],
+      offset: { x: Math.sin(d / 1000), y: Math.sin(d / 1000) },
+    });
+    requestAnimationFrame(draw);
+  };
+
+  requestAnimationFrame(draw);
+});
+
+//куб
+wgpuAppEntrypoint({
+  title: "матричные преобразования",
+  alphaMode: "premultiplied",
+}).then(({ container }) => {
+  container.bind(Cube).toSelf();
+
+  const сube = container.get<Cube>(Cube);
+
+  let lastTime = 0;
+  let d = 0;
+  const draw = (time: number) => {
+    const dt = time - lastTime;
+    lastTime = time;
+    d += dt;
+
+    сube.draw({ rotate: d / 10, scale: [0.3, 0.3, 0.3], offset: [0, 0, 0] });
+
+    requestAnimationFrame(draw);
+  };
+
+  requestAnimationFrame(draw);
 });

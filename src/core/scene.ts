@@ -39,7 +39,7 @@ export class Scene {
     this.context.configure({
       device: gpu.device,
       format: gpu.presentationFormat,
-      alphaMode: "premultiplied",
+      alphaMode: settings.alphaMode,
     });
   }
 

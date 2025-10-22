@@ -30,8 +30,8 @@ export class Scene {
 
     this.canvas = this.container.querySelector("canvas")!;
 
-    this.canvas.width = 300;
-    this.canvas.height = 300;
+    this.canvas.width = settings?.canvasWidth ?? 300;
+    this.canvas.height = settings?.canvasHeight ?? 300;
     this.canvas.style.border = "1px dotted black";
 
     this.context = this.canvas.getContext("webgpu")!;

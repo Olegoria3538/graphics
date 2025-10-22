@@ -114,7 +114,7 @@ export class Triangle {
       },
       primitive: {
         topology: "triangle-list",
-        cullMode: "none", // Временно отключаем отсечение для отладки
+        cullMode: "front",
       },
       depthStencil: {
         depthWriteEnabled: true,
